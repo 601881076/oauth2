@@ -3,6 +3,7 @@ package com.spring.boot.oauth2.oauth2.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -32,6 +33,17 @@ public class WebSecurityConfig  extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+
+    /**
+     * 加载授权管理bean，密码模式需要该类
+     * @return
+     * @throws Exception
+     */
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
