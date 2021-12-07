@@ -2,6 +2,7 @@ package com.spring.boot.oauth2.oauth2.config;
 
 import com.spring.boot.oauth2.oauth2.server.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -9,6 +10,7 @@ import org.springframework.security.oauth2.config.annotation.configurers.ClientD
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 
 /**
 * @Description:    授权服务器配置
@@ -33,6 +35,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Autowired
     private UserService userService;
 
+    @Autowired
+    // 因为TokenStore的实现类很多，这里需要指定使用哪一个实现类
+    @Qualifier("redisTokenStore")
+    private TokenStore tokenStore;
+
     /**
      * 使用密码模式时需要配置
      * @param endpoints
@@ -40,7 +47,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.authenticationManager(authenticationManager).userDetailsService(userService);
+        endpoints.authenticationManager(authenticationManager)
+                .userDetailsService(userService)
+                .tokenStore(tokenStore)
+        ;
     }
 
     @Override

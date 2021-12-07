@@ -1,0 +1,13 @@
+spring:
+  # redis≈‰÷√
+  redis:
+    # µÿ÷∑
+    host: r-bp1r3hqsubhw5ddhwdpd.redis.rds.aliyuncs.com
+    port: 6379
+    password: Secret_123
+    database: 1
+    timeout: 3000
+    maxIdle: 50
+    maxTotal: 200
+    maxWaitMillis: 2000
+    testOnBorrow: true
