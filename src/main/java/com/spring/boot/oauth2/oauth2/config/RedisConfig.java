@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.provider.token.store.redis.RedisToken
 * @Description:    redis配置类
  * 功能：
  *  1. 使用redis存储token
+ *  2. 当使用JwtTokenStore作为Token配置时，需要将redisConfig类删掉
 * @Author:         tan_yi
 * @CreateDate:     2021/12/7 21:08
 * @UpdateUser:     tan_yi
@@ -19,7 +20,8 @@ import org.springframework.security.oauth2.provider.token.store.redis.RedisToken
 * @Version:        1.0
 * @company:        newLand
 */
-@Configuration
+
+//@Configuration
 public class RedisConfig {
 
     @Autowired

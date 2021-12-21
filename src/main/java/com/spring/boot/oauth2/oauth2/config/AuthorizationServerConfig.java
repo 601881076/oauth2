@@ -1,5 +1,6 @@
 package com.spring.boot.oauth2.oauth2.config;
 
+import com.spring.boot.oauth2.oauth2.enhancer.JwtTokenEnhancer;
 import com.spring.boot.oauth2.oauth2.server.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,7 +11,13 @@ import org.springframework.security.oauth2.config.annotation.configurers.ClientD
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.provider.token.TokenEnhancer;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * @Description:    授权服务器配置
@@ -35,10 +42,25 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Autowired
     private UserService userService;
 
-    @Autowired
     // 因为TokenStore的实现类很多，这里需要指定使用哪一个实现类
-    @Qualifier("redisTokenStore")
+    @Autowired
+    // 使用redis存储以及Token
+    /*@Qualifier("redisTokenStore")
+    private TokenStore tokenStore;*/
+
+    // 使用Jwt配置Token
+    @Qualifier("getJwtTokenStore")
     private TokenStore tokenStore;
+
+    // JwtToken转换器
+    @Qualifier("getJwtAccessTokenConverter")
+    @Autowired
+    private JwtAccessTokenConverter jwtAccessTokenConverter;
+
+    // 加载Jwt内容增强器
+    @Autowired
+    private JwtTokenEnhancer jwtTokenEnhancer;
+
 
     /**
      * 使用密码模式时需要配置
@@ -47,9 +69,21 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+        // 设置内容增强器
+        TokenEnhancerChain enhancerChain = new TokenEnhancerChain();
+        List<TokenEnhancer> delegates = new ArrayList<>();
+        //配置JWT的内容增强器
+        delegates.add(jwtTokenEnhancer);
+        delegates.add(jwtAccessTokenConverter);
+        enhancerChain.setTokenEnhancers(delegates);
+
         endpoints.authenticationManager(authenticationManager)
                 .userDetailsService(userService)
+                // 使用redis配置Token仅需要下面一行代码即可
                 .tokenStore(tokenStore)
+                // 设置 AccessToken 转 JwtToken 转换器
+                .accessTokenConverter(jwtAccessTokenConverter)
+                .tokenEnhancer(enhancerChain)
         ;
     }
 
