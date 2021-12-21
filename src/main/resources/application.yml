@@ -1,7 +1,7 @@
 spring:
-  # redisÅäÖÃ
+  # redis é…ç½®
   redis:
-    # µØÖ·
+    # redis åœ°å€
     host: r-bp1r3hqsubhw5ddhwdpd.redis.rds.aliyuncs.com
     port: 6379
     password: Secret_123
